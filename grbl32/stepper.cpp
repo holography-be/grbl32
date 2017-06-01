@@ -451,8 +451,8 @@ void st_reset()
   st_go_idle();
   
   // Initialize stepper algorithm variables.
-  memset(&prep, 0, sizeof(st_prep_t));
-  memset(&st, 0, sizeof(stepper_t));
+  memset((void *)&prep, 0, sizeof(st_prep_t));
+  memset((void *)&st, 0, sizeof(stepper_t));
   st.exec_segment = NULL;
   pl_block = NULL;  // Planner block pointer used by segment buffer
   segment_buffer_tail = 0;
@@ -472,9 +472,17 @@ void st_reset()
 void stepper_init()
 {
   // Configure step and direction interface pins
-  STEP_DDR |= STEP_MASK;
-  STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
-  DIRECTION_DDR |= DIRECTION_MASK;
+  // **REMOVE** //
+  //STEP_DDR |= STEP_MASK;
+  //STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
+  //DIRECTION_DDR |= DIRECTION_MASK;
+  // **REMOVE** //
+  STEP_PORT->TRISxCLR.w = STEP_MASK;
+  STEP_PORT->ODCxCLR.w = STEP_MASK;
+  ENABLE_MOTOR_PORT->TRISxCLR.w = ENABLE_MOTOR_MASK;
+  ENABLE_MOTOR_PORT->ODCxCLR.w = ENABLE_MOTOR_MASK;
+  DIR_PORT->TRISxCLR.w = DIRECTION_MASK;
+  DIR_PORT->ODCxCLR.w = DIRECTION_MASK;
 
   // Configure Timer 1: Stepper Driver Interrupt
   TCCR1B &= ~(1<<WGM13); // waveform generation = 0100 = CTC

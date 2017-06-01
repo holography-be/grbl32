@@ -1,4 +1,6 @@
-#include "grbl.h"
+
+#include <grbl.h>
+#include "LiquidCrystal_I2C.h"
 
 
 // Declare system global variable structure
@@ -9,14 +11,16 @@ void setup()
 
   /* add setup code here */
 	// Initialize system upon power-up.
+	uint32_t status = disableInterrupts();
+
 	serial_init();   // Setup serial baud rate and interrupts
 	settings_init(); // Load Grbl settings from EEPROM
 	stepper_init();  // Configure stepper pins and interrupt timers
 	system_init();   // Configure pinout pins and pin-change interrupt
-
-	memset(&sys, 0, sizeof(system_t));  // Clear all system variables
+	
+	memset((void *)&sys, 0, sizeof(system_t));  // Clear all system variables
 	sys.abort = true;   // Set abort to complete initialization
-	sei(); // Enable interrupts
+	restoreInterrupts(status);
 
 	// Check for power-up and set system alarm if homing is enabled to force homing cycle
 	// by setting Grbl's alarm state. Alarm locks out all g-code commands, including the

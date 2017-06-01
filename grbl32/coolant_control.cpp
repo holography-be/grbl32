@@ -19,11 +19,13 @@
 */  
 
 #include "grbl.h"
-
+#include "extern_definition.h"
 
 void coolant_init()
 {
-  COOLANT_FLOOD_DDR |= (1 << COOLANT_FLOOD_BIT);
+	LASER_FAN_PORT->TRISxCLR.w = LASER_FAN_MASK;
+	LASER_FAN_PORT->ODCxCLR.w = LASER_FAN_MASK;
+  //COOLANT_FLOOD_DDR |= (1 << COOLANT_FLOOD_BIT);
   #ifdef ENABLE_M7
     COOLANT_MIST_DDR |= (1 << COOLANT_MIST_BIT);
   #endif
@@ -33,7 +35,7 @@ void coolant_init()
 
 void coolant_stop()
 {
-  COOLANT_FLOOD_PORT &= ~(1 << COOLANT_FLOOD_BIT);
+  LASER_FAN_PORT->LATxCLR.w = LASER_FAN_MASK;
   #ifdef ENABLE_M7
     COOLANT_MIST_PORT &= ~(1 << COOLANT_MIST_BIT);
   #endif
@@ -42,8 +44,8 @@ void coolant_stop()
 
 void coolant_set_state(uint8_t mode)
 {
-  if (mode == COOLANT_FLOOD_ENABLE) {
-    COOLANT_FLOOD_PORT |= (1 << COOLANT_FLOOD_BIT);
+  if (mode == LASER_FAN_ENABLE) {
+    LASER_FAN_PORT->LATxSET.w = LASER_FAN_MASK;
 
   #ifdef ENABLE_M7  
     } else if (mode == COOLANT_MIST_ENABLE) {

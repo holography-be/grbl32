@@ -37,6 +37,10 @@
   #include "cpu_map/cpu_map_atmega2560.h"
 #endif
 
+#ifdef CPU_MAP_CHIPKITMAX32 // (Arduino Mega 2560) Working @EliteEng
+  #include "cpu_map\cpu_map_ChipKitMax32.h"
+#endif
+
 /* 
 #ifdef CPU_MAP_CUSTOM_PROC
   // For a custom pin map or different processor, copy and edit one of the available cpu

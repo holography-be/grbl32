@@ -47,7 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\libraries;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\libraries;C:\Users\Jean_2\Documents\Arduino\libraries;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\avr;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\pps;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\util;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\variants\Max32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\pic32mx\include;C:\Users\Jean_2\Documents\GitHub\grbl32\grbl32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\1.42-pic32gcc\include;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\lib\gcc\pic32mx\4.8.3\include;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\lib\gcc\pic32mx\4.8.3\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\libraries\Wire;C:\Program Files (x86)\Arduino\libraries;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\libraries;C:\Users\Jean_2\Documents\Arduino\libraries;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\avr;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\pps;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\cores\pic32\util;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\hardware\pic32\1.3.1\variants\Max32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\pic32mx\include;C:\Users\Jean_2\Documents\GitHub\grbl32\grbl32;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\1.42-pic32gcc\include;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\lib\gcc\pic32mx\4.8.3\include;C:\Users\Jean_2\AppData\Local\arduino15\packages\chipKIT\tools\pic32-tools\1.42-pic32gcc\lib\gcc\pic32mx\4.8.3\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\Jean_2\Documents\Arduino\grbl32\__vm\.grbl32.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__PIC32_32MX795F512L__;ARDUINO_ARCH_PIC32;F_CPU=80000000L;ARDUINO=106013;_BOARD_MEGA_;MPIDEVER=16777998;MPIDE=150;IDE=Arduino;__cplusplus=201103L;GCC_VERSION=40803;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -79,7 +79,56 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AT24CX.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="coolant_control.h" />
+    <ClInclude Include="cpu_map.h" />
+    <ClInclude Include="cpu_map\cpu_map_atmega2560.h" />
+    <ClInclude Include="cpu_map\cpu_map_atmega328p.h" />
+    <ClInclude Include="cpu_map\cpu_map_ChipKitMax32.h" />
+    <ClInclude Include="defaults.h" />
+    <ClInclude Include="defaults\defaults_generic.h" />
+    <ClInclude Include="eeprom.h" />
+    <ClInclude Include="extern_definition.h" />
+    <ClInclude Include="gcode.h" />
+    <ClInclude Include="grbl.h" />
+    <ClInclude Include="initexternal.h" />
+    <ClInclude Include="limits.h" />
+    <ClInclude Include="LiquidCrystal_I2C.h" />
+    <ClInclude Include="motion_control.h" />
+    <ClInclude Include="nuts_bolts.h" />
+    <ClInclude Include="p32mx795f512l.h" />
+    <ClInclude Include="planner.h" />
+    <ClInclude Include="print.h" />
+    <ClInclude Include="probe.h" />
+    <ClInclude Include="protocol.h" />
+    <ClInclude Include="report.h" />
+    <ClInclude Include="serial.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="spindle_control.h" />
+    <ClInclude Include="stepper.h" />
+    <ClInclude Include="system.h" />
     <ClInclude Include="__vm\.grbl32.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AT24CX.cpp" />
+    <ClCompile Include="coolant_control.cpp" />
+    <ClCompile Include="eeprom.cpp" />
+    <ClCompile Include="gcode.cpp" />
+    <ClCompile Include="limits.cpp" />
+    <ClCompile Include="LiquidCrystal_I2C.cpp" />
+    <ClCompile Include="motion_control.cpp" />
+    <ClCompile Include="nuts_bolts.cpp" />
+    <ClCompile Include="planner.cpp" />
+    <ClCompile Include="print.cpp" />
+    <ClCompile Include="probe.cpp" />
+    <ClCompile Include="protocol.cpp" />
+    <ClCompile Include="report.cpp" />
+    <ClCompile Include="serial.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="spindle_control.cpp" />
+    <ClCompile Include="stepper.cpp" />
+    <ClCompile Include="system.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

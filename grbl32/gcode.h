@@ -112,9 +112,9 @@
 #define SPINDLE_ENABLE_CCW 2 // M4
 
 // Modal Group M8: Coolant control
-#define COOLANT_DISABLE 0 // M9 (Default: Must be zero)
+#define LASER_FAN_DISABLE 0 // M9 (Default: Must be zero)
 #define COOLANT_MIST_ENABLE 1 // M7
-#define COOLANT_FLOOD_ENABLE 2 // M8
+#define LASER_FAN_ENABLE 2 // M8
 
 // Modal Group G8: Tool length offset
 #define TOOL_LENGTH_OFFSET_CANCEL 0 // G49 (Default: Must be zero)
