@@ -94,7 +94,6 @@
     <ClInclude Include="grbl.h" />
     <ClInclude Include="initexternal.h" />
     <ClInclude Include="limits.h" />
-    <ClInclude Include="LiquidCrystal_I2C.h" />
     <ClInclude Include="motion_control.h" />
     <ClInclude Include="nuts_bolts.h" />
     <ClInclude Include="p32mx795f512l.h" />
@@ -116,7 +115,6 @@
     <ClCompile Include="eeprom.cpp" />
     <ClCompile Include="gcode.cpp" />
     <ClCompile Include="limits.cpp" />
-    <ClCompile Include="LiquidCrystal_I2C.cpp" />
     <ClCompile Include="motion_control.cpp" />
     <ClCompile Include="nuts_bolts.cpp" />
     <ClCompile Include="planner.cpp" />

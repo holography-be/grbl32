@@ -305,13 +305,13 @@ void protocol_execute_realtime()
           // Re-energize powered components, if disabled by SAFETY_DOOR.
           if (sys.suspend & SUSPEND_ENERGIZE) { 
             // Delayed Tasks: Restart spindle and coolant, delay to power-up, then resume cycle.
-            if (gc_state.modal.spindle != SPINDLE_DISABLE) { 
+            if (gc_state.modal.spindle != LASER_DISABLE) { 
               spindle_set_state(gc_state.modal.spindle, gc_state.spindle_speed); 
               delay_ms(SAFETY_DOOR_SPINDLE_DELAY); // TODO: Blocking function call. Need a non-blocking one eventually.
             }
-            if (gc_state.modal.coolant != COOLANT_DISABLE) { 
+            if (gc_state.modal.coolant != LASER_FAN_DISABLE) { 
               coolant_set_state(gc_state.modal.coolant); 
-              delay_ms(SAFETY_DOOR_COOLANT_DELAY); // TODO: Blocking function call. Need a non-blocking one eventually.
+              //delay_ms(SAFETY_DOOR_COOLANT_DELAY); // TODO: Blocking function call. Need a non-blocking one eventually.
             }
             // TODO: Install return to pre-park position.
           }

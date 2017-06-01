@@ -52,7 +52,7 @@
 // discarded when entirely consumed and completed by the segment buffer. Also, AMASS alters this
 // data for its own use. 
 typedef struct {  
-  uint8_t direction_bits;
+  uint32_t direction_bits;
   uint32_t steps[N_AXIS];
   uint32_t step_event_count;
 } st_block_t;
@@ -67,7 +67,7 @@ typedef struct {
   uint8_t st_block_index;   // Stepper block data index. Uses this information to execute this segment.
   uint16_t cycles_per_tick; // Step distance traveled per ISR tick, aka step rate.
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
-    uint8_t amass_level;    // Indicates AMASS level for the ISR to execute this segment
+    uint32_t amass_level;    // Indicates AMASS level for the ISR to execute this segment
   #else
     uint8_t prescaler;      // Without AMASS, a prescaler is required to adjust for slow timing.
   #endif
@@ -81,13 +81,13 @@ typedef struct {
            counter_y, 
            counter_z;
   #ifdef STEP_PULSE_DELAY
-    uint8_t step_bits;  // Stores out_bits output to complete the step pulse delay
+    uint32_t step_bits;  // Stores out_bits output to complete the step pulse delay
   #endif
   
-  uint8_t execute_step;     // Flags step execution for each interrupt.
-  uint8_t step_pulse_time;  // Step pulse reset time after step rise
-  uint8_t step_outbits;         // The next stepping-bits to be output
-  uint8_t dir_outbits;
+  uint32_t execute_step;     // Flags step execution for each interrupt.
+  uint32_t step_pulse_time;  // Step pulse reset time after step rise
+  uint32_t step_outbits;         // The next stepping-bits to be output
+  uint32_t dir_outbits;
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     uint32_t steps[N_AXIS];
   #endif
@@ -105,8 +105,8 @@ static uint8_t segment_buffer_head;
 static uint8_t segment_next_head;
 
 // Step and direction port invert masks. 
-static uint8_t step_port_invert_mask;
-static uint8_t dir_port_invert_mask;
+static uint32_t step_port_invert_mask;
+static uint32_t dir_port_invert_mask;
 
 // Used to avoid ISR nesting of the "Stepper Driver Interrupt". Should never occur though.
 static volatile uint8_t busy;   
@@ -280,17 +280,21 @@ void st_go_idle()
 // with probing and homing cycles that require true real-time positions.
 ISR(TIMER1_COMPA_vect)
 {        
+  uint32_t temp_port_value;
 // SPINDLE_ENABLE_PORT ^= 1<<SPINDLE_ENABLE_BIT; // Debug: Used to time ISR
   if (busy) { return; } // The busy-flag is used to avoid reentering this interrupt
   
   // Set the direction pins a couple of nanoseconds before we step the steppers
-  DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | (st.dir_outbits & DIRECTION_MASK);
+  temp_port_value = DIR_PORT->PORTxbits.w;
+  DIR_PORT->LATxbits.w = (temp_port_value & ~DIRECTION_MASK) | (st.dir_outbits & DIRECTION_MASK);
 
   // Then pulse the stepping pins
   #ifdef STEP_PULSE_DELAY
-    st.step_bits = (STEP_PORT & ~STEP_MASK) | st.step_outbits; // Store out_bits to prevent overwriting.
+    temp_port_value = STEP_PORT->PORTxbits.w;
+    st.step_bits = (temp_port_value & ~STEP_MASK) | st.step_outbits; // Store out_bits to prevent overwriting.
   #else  // Normal operation
-    STEP_PORT = (STEP_PORT & ~STEP_MASK) | st.step_outbits;
+	temp_port_value = STEP_PORT->PORTxbits.w;
+    STEP_PORT->LATxbits.w = (temp_port_value & ~STEP_MASK) | st.step_outbits;
   #endif  
 
   // Enable step pulse reset timer so that The Stepper Port Reset Interrupt can reset the signal after
@@ -359,7 +363,7 @@ ISR(TIMER1_COMPA_vect)
   if (st.counter_x > st.exec_block->step_event_count) {
     st.step_outbits |= (1<<X_STEP_BIT);
     st.counter_x -= st.exec_block->step_event_count;
-    if (st.exec_block->direction_bits & (1<<X_DIRECTION_BIT)) { sys.position[X_AXIS]--; }
+    if (st.exec_block->direction_bits & (1<<X_DIR_BIT)) { sys.position[X_AXIS]--; }
     else { sys.position[X_AXIS]++; }
   }
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
@@ -370,7 +374,7 @@ ISR(TIMER1_COMPA_vect)
   if (st.counter_y > st.exec_block->step_event_count) {
     st.step_outbits |= (1<<Y_STEP_BIT);
     st.counter_y -= st.exec_block->step_event_count;
-    if (st.exec_block->direction_bits & (1<<Y_DIRECTION_BIT)) { sys.position[Y_AXIS]--; }
+    if (st.exec_block->direction_bits & (1<<Y_DIR_BIT)) { sys.position[Y_AXIS]--; }
     else { sys.position[Y_AXIS]++; }
   }
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
@@ -381,7 +385,7 @@ ISR(TIMER1_COMPA_vect)
   if (st.counter_z > st.exec_block->step_event_count) {
     st.step_outbits |= (1<<Z_STEP_BIT);
     st.counter_z -= st.exec_block->step_event_count;
-    if (st.exec_block->direction_bits & (1<<Z_DIRECTION_BIT)) { sys.position[Z_AXIS]--; }
+    if (st.exec_block->direction_bits & (1<<Z_DIR_BIT)) { sys.position[Z_AXIS]--; }
     else { sys.position[Z_AXIS]++; }
   }  
 
@@ -414,8 +418,10 @@ ISR(TIMER1_COMPA_vect)
 // completing one step cycle.
 ISR(TIMER0_OVF_vect)
 {
+  uint32_t temp_port_value;
   // Reset stepping pins (leave the direction pins)
-  STEP_PORT = (STEP_PORT & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK); 
+  temp_port_value = STEP_PORT->PORTxbits.w;
+  STEP_PORT->LATxbits.w = (temp_port_value & ~STEP_MASK) | (step_port_invert_mask & STEP_MASK); 
   TCCR0B = 0; // Disable Timer0 to prevent re-entering this interrupt when it's not needed. 
 }
 #ifdef STEP_PULSE_DELAY
@@ -448,6 +454,7 @@ void st_generate_step_dir_invert_masks()
 void st_reset()
 {
   // Initialize stepper driver idle state.
+	uint32_t temp_port_value;
   st_go_idle();
   
   // Initialize stepper algorithm variables.
@@ -463,8 +470,10 @@ void st_reset()
   st_generate_step_dir_invert_masks();
       
   // Initialize step and direction port pins.
-  STEP_PORT = (STEP_PORT & ~STEP_MASK) | step_port_invert_mask;
-  DIRECTION_PORT = (DIRECTION_PORT & ~DIRECTION_MASK) | dir_port_invert_mask;
+  temp_port_value = STEP_PORT->PORTxbits.w;
+  STEP_PORT->LATxbits.w = (temp_port_value & ~STEP_MASK) | step_port_invert_mask;
+  temp_port_value = DIR_PORT->PORTxbits.w;
+  DIR_PORT->LATxbits.w = (temp_port_value & ~DIRECTION_MASK) | dir_port_invert_mask;
 }
 
 

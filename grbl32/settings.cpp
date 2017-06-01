@@ -291,7 +291,7 @@ void settings_init() {
 
 
 // Returns step pin mask according to Grbl internal axis indexing.
-uint8_t get_step_pin_mask(uint8_t axis_idx)
+uint32_t get_step_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_STEP_BIT)); }
   if ( axis_idx == Y_AXIS ) { return((1<<Y_STEP_BIT)); }
@@ -300,7 +300,7 @@ uint8_t get_step_pin_mask(uint8_t axis_idx)
 
 
 // Returns direction pin mask according to Grbl internal axis indexing.
-uint8_t get_direction_pin_mask(uint8_t axis_idx)
+uint32_t get_direction_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_DIR_BIT)); }
   if ( axis_idx == Y_AXIS ) { return((1<<Y_DIR_BIT)); }
@@ -309,9 +309,9 @@ uint8_t get_direction_pin_mask(uint8_t axis_idx)
 
 
 // Returns limit pin mask according to Grbl internal axis indexing.
-uint8_t get_limit_pin_mask(uint8_t axis_idx)
+uint32_t get_limit_pin_mask(uint8_t axis_idx)
 {
-  if ( axis_idx == X_AXIS ) { return((1<<X_LIMIT_BIT)); }
-  if ( axis_idx == Y_AXIS ) { return((1<<Y_LIMIT_BIT)); }
-  return((1<<Z_LIMIT_BIT));
+  if (axis_idx == X_AXIS) { return((1<<X_MAX_BIT)|(1<<X_MIN_BIT)); }
+  if (axis_idx == Y_AXIS) { return((1<<Y_MAX_BIT)|(1<<Y_MIN_BIT)); }
+  return((1<<Z_MAX_BIT)|(1<<Z_MIN_BIT));
 }

@@ -202,17 +202,17 @@
 // Execute dwell in seconds.
 void mc_dwell(float seconds) 
 {
-   if (sys.state == STATE_CHECK_MODE) { return; }
-   
-   uint16_t i = floor(1000/DWELL_TIME_STEP*seconds);
-   protocol_buffer_synchronize();
-   delay_ms(floor(1000*seconds-i*DWELL_TIME_STEP)); // Delay millisecond remainder.
-   while (i-- > 0) {
-     // NOTE: Check and execute realtime commands during dwell every <= DWELL_TIME_STEP milliseconds.
-     protocol_execute_realtime();
-     if (sys.abort) { return; }
-     _delay_ms(DWELL_TIME_STEP); // Delay DWELL_TIME_STEP increment
-   }
+   //if (sys.state == STATE_CHECK_MODE) { return; }
+   //
+   //uint16_t i = floor(1000/DWELL_TIME_STEP*seconds);
+   //protocol_buffer_synchronize();
+   //delay_ms(floor(1000*seconds-i*DWELL_TIME_STEP)); // Delay millisecond remainder.
+   //while (i-- > 0) {
+   //  // NOTE: Check and execute realtime commands during dwell every <= DWELL_TIME_STEP milliseconds.
+   //  protocol_execute_realtime();
+   //  if (sys.abort) { return; }
+   //  _delay_ms(DWELL_TIME_STEP); // Delay DWELL_TIME_STEP increment
+   //}
 }
 
 

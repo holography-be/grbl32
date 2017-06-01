@@ -223,22 +223,22 @@
 //#define LINE_BUFFER_SIZE	100
 
 // Define step pulse output pins. NOTE: All step bit pins must be on the same port.
-#define STEP_DDR      DDRA
-#define STEP_PORT     PORTA
-#define STEP_PIN      PINA
-#define X_STEP_BIT    2 // MEGA2560 Digital Pin 24
-#define Y_STEP_BIT    3 // MEGA2560 Digital Pin 25
-#define Z_STEP_BIT    4 // MEGA2560 Digital Pin 26
-#define STEP_MASK ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
+//#define STEP_DDR      DDRA
+//#define STEP_PORT     PORTA
+//#define STEP_PIN      PINA
+//#define X_STEP_BIT    2 // MEGA2560 Digital Pin 24
+//#define Y_STEP_BIT    3 // MEGA2560 Digital Pin 25
+//#define Z_STEP_BIT    4 // MEGA2560 Digital Pin 26
+//#define STEP_MASK ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
 
 // Define step direction output pins. NOTE: All direction pins must be on the same port.
-#define DIRECTION_DDR     DDRC
-#define DIRECTION_PORT    PORTC
-#define DIRECTION_PIN     PINC
+//#define DIRECTION_DDR     DDRC
+//#define DIRECTION_PORT    PORTC
+//#define DIRECTION_PIN     PINC
 //#define X_DIRECTION_BIT   7 // MEGA2560 Digital Pin 30
 //#define Y_DIRECTION_BIT   6 // MEGA2560 Digital Pin 31
 //#define Z_DIRECTION_BIT   5 // MEGA2560 Digital Pin 32
-#define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
+//#define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
 
 // Define stepper driver enable/disable output pin.
 #define STEPPERS_DISABLE_DDR   DDRB
@@ -251,9 +251,9 @@
 #define LIMIT_DDR       DDRB
 #define LIMIT_PORT      PORTB
 #define LIMIT_PIN       PINB
-#define X_LIMIT_BIT     4 // MEGA2560 Digital Pin 10
-#define Y_LIMIT_BIT     5 // MEGA2560 Digital Pin 11
-#define Z_LIMIT_BIT     6 // MEGA2560 Digital Pin 12
+//#define X_LIMIT_BIT     4 // MEGA2560 Digital Pin 10
+//#define Y_LIMIT_BIT     5 // MEGA2560 Digital Pin 11
+//#define Z_LIMIT_BIT     6 // MEGA2560 Digital Pin 12
 #define LIMIT_INT       PCIE0  // Pin change interrupt enable pin
 #define LIMIT_INT_vect  PCINT0_vect 
 #define LIMIT_PCMSK     PCMSK0 // Pin change interrupt register

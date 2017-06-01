@@ -361,12 +361,12 @@ void report_gcode_modes()
   switch (gc_state.modal.spindle) {
     case SPINDLE_ENABLE_CW : printPgmString(PSTR(" M3")); break;
     case SPINDLE_ENABLE_CCW : printPgmString(PSTR(" M4")); break;
-    case SPINDLE_DISABLE : printPgmString(PSTR(" M5")); break;
+    case LASER_DISABLE : printPgmString(PSTR(" M5")); break;
   }
   
   switch (gc_state.modal.coolant) {
-    case COOLANT_DISABLE : printPgmString(PSTR(" M9")); break;
-    case COOLANT_FLOOD_ENABLE : printPgmString(PSTR(" M8")); break;
+    case LASER_FAN_DISABLE : printPgmString(PSTR(" M9")); break;
+    case LASER_FAN_ENABLE : printPgmString(PSTR(" M8")); break;
     #ifdef ENABLE_M7
       case COOLANT_MIST_ENABLE : printPgmString(PSTR(" M7")); break;
     #endif

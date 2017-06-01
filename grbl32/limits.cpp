@@ -195,7 +195,7 @@ void limits_go_home(uint8_t cycle_mask)
 
   // Initialize
   uint8_t n_cycle = (2*N_HOMING_LOCATE_CYCLE+1);
-  uint8_t step_pin[N_AXIS];
+  uint32_t step_pin[N_AXIS];
   float target[N_AXIS];
   float max_travel = 0.0;
   uint8_t idx;
