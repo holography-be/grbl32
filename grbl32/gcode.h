@@ -107,7 +107,7 @@
 #define CONTROL_MODE_EXACT_PATH 0 // G61 (Default: Must be zero)
 
 // Modal Group M7: Spindle control
-#define SPINDLE_DISABLE 0 // M5 (Default: Must be zero)
+#define LASER_DISABLE 0 // M5 (Default: Must be zero)
 #define SPINDLE_ENABLE_CW 1 // M3
 #define SPINDLE_ENABLE_CCW 2 // M4
 

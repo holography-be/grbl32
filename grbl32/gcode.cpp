@@ -296,7 +296,7 @@ uint8_t gc_execute_line(char *line)
               #ifndef USE_SPINDLE_DIR_AS_ENABLE_PIN
                 case 4: gc_block.modal.spindle = SPINDLE_ENABLE_CCW; break;
               #endif
-              case 5: gc_block.modal.spindle = SPINDLE_DISABLE; break;
+              case 5: gc_block.modal.spindle = LASER_DISABLE; break;
             }
             break;            
          #ifdef ENABLE_M7  
@@ -308,8 +308,8 @@ uint8_t gc_execute_line(char *line)
              #ifdef ENABLE_M7
               case 7: gc_block.modal.coolant = COOLANT_MIST_ENABLE; break;
              #endif
-              case 8: gc_block.modal.coolant = COOLANT_FLOOD_ENABLE; break;
-              case 9: gc_block.modal.coolant = COOLANT_DISABLE; break;
+              case 8: gc_block.modal.coolant = LASER_FAN_ENABLE; break;
+              case 9: gc_block.modal.coolant = LASER_FAN_DISABLE; break;
             }
             break;
           default: FAIL(STATUS_GCODE_UNSUPPORTED_COMMAND); // [Unsupported M command]
@@ -850,7 +850,7 @@ uint8_t gc_execute_line(char *line)
   // [4. Set spindle speed ]:
   if (gc_state.spindle_speed != gc_block.values.s) { 
     // Update running spindle only if not in check mode and not already enabled.
-    if (gc_state.modal.spindle != SPINDLE_DISABLE) { spindle_run(gc_state.modal.spindle, gc_block.values.s); }
+    if (gc_state.modal.spindle != LASER_DISABLE) { spindle_run(gc_state.modal.spindle, gc_block.values.s); }
     gc_state.spindle_speed = gc_block.values.s; 
   }
     
@@ -1051,8 +1051,8 @@ uint8_t gc_execute_line(char *line)
 	  gc_state.modal.feed_rate = FEED_RATE_MODE_UNITS_PER_MIN;
 	  // gc_state.modal.cutter_comp = CUTTER_COMP_DISABLE; // Not supported.
 	  gc_state.modal.coord_select = 0; // G54
-	  gc_state.modal.spindle = SPINDLE_DISABLE;
-	  gc_state.modal.coolant = COOLANT_DISABLE;
+	  gc_state.modal.spindle = LASER_DISABLE;
+	  gc_state.modal.coolant = LASER_FAN_DISABLE;
 	  // gc_state.modal.override = OVERRIDE_DISABLE; // Not supported.
 	  
 	  // Execute coordinate change and spindle/coolant stop.

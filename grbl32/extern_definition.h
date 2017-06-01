@@ -5,7 +5,7 @@
 #ifndef EXTERN_DEFINITION_H
 #define EXTERN_DEFINITION_H
 
-#include "LiquidCrystal_I2C.h"
+//#include "LiquidCrystal_I2C.h"
 
 extern p32_ioport *portA;
 extern p32_ioport *portB;
@@ -90,7 +90,7 @@ extern uint32_t blinkMask;
 
 extern volatile uint8_t limit;
 
-extern LiquidCrystal_I2C lcd;
+//extern LiquidCrystal_I2C lcd;
 
 //extern settings_t settings;
 

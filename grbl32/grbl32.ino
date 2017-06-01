@@ -1,7 +1,7 @@
 
 #include <grbl.h>
-#include "LiquidCrystal_I2C.h"
-
+//#include "LiquidCrystal_I2C.h"
+#include "eeprom.h"
 
 // Declare system global variable structure
 system_t sys;
@@ -18,7 +18,7 @@ void setup()
 	stepper_init();  // Configure stepper pins and interrupt timers
 	system_init();   // Configure pinout pins and pin-change interrupt
 	
-	memset((void *)&sys, 0, sizeof(system_t));  // Clear all system variables
+	memset(&sys, 0, sizeof(system_t));  // Clear all system variables
 	sys.abort = true;   // Set abort to complete initialization
 	restoreInterrupts(status);
 
@@ -65,6 +65,7 @@ void setup()
 		sys_rt_exec_alarm = 0;
 		sys.suspend = false;
 		sys.soft_limit = false;
+	}
 }
 
 void loop()

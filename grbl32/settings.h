@@ -57,10 +57,14 @@
 // NOTE: The Atmega328p has 1KB EEPROM. The upper half is reserved for parameters and
 // the startup script. The lower half contains the global settings and space for future 
 // developments.
-#define EEPROM_ADDR_GLOBAL         1U
-#define EEPROM_ADDR_PARAMETERS     512U
-#define EEPROM_ADDR_STARTUP_BLOCK  768U
-#define EEPROM_ADDR_BUILD_INFO     942U
+//#define EEPROM_ADDR_GLOBAL         1U
+//#define EEPROM_ADDR_PARAMETERS     512U
+//#define EEPROM_ADDR_STARTUP_BLOCK  768U
+//#define EEPROM_ADDR_BUILD_INFO     942U
+#define EEPROM_ADDR_GLOBAL         0U
+#define EEPROM_ADDR_PARAMETERS     EEPROM_ADDR_GLOBAL  + 1024U
+#define EEPROM_ADDR_STARTUP_BLOCK  EEPROM_ADDR_GLOBAL  + 2048U
+#define EEPROM_ADDR_BUILD_INFO     EEPROM_ADDR_GLOBAL  + 3072U
 
 // Define EEPROM address indexing for coordinate parameters
 #define N_COORDINATE_SYSTEM 6  // Number of supported work coordinate systems (from index 1)
@@ -99,6 +103,7 @@ typedef struct {
   float homing_seek_rate;
   uint16_t homing_debounce_delay;
   float homing_pulloff;
+  uint8_t laser_power_divisor;
 } settings_t;
 extern settings_t settings;
 

@@ -50,7 +50,7 @@ void settings_write_coord_data(uint8_t coord_select, float *coord_data)
 // Method to store Grbl global settings struct and version number into EEPROM
 void write_global_settings() 
 {
-  eeprom_put_char(0, SETTINGS_VERSION);
+  //eeprom_put_char(0, SETTINGS_VERSION);
   memcpy_to_eeprom_with_checksum(EEPROM_ADDR_GLOBAL, (char*)&settings, sizeof(settings_t));
 }
 
@@ -91,6 +91,7 @@ void settings_restore(uint8_t restore_flag) {
 	settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
 	settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
 	settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);    
+	settings.laser_power_divisor = DEFAULT_LASER_POWER_DIVISOR;
 
 	write_global_settings();
   }
@@ -158,17 +159,9 @@ uint8_t settings_read_coord_data(uint8_t coord_select, float *coord_data)
 
 // Reads Grbl global settings struct from EEPROM.
 uint8_t read_global_settings() {
-  // Check version-byte of eeprom
-  uint8_t version = eeprom_get_char(0);
-  if (version == SETTINGS_VERSION) {
-    // Read settings-record and check checksum
-    if (!(memcpy_from_eeprom_with_checksum((char*)&settings, EEPROM_ADDR_GLOBAL, sizeof(settings_t)))) {
-      return(false);
-    }
-  } else {
-    return(false); 
-  }
-  return(true);
+  //// Check version-byte of eeprom
+	memcpy_from_eeprom_with_checksum((char*)&settings, EEPROM_ADDR_GLOBAL, sizeof(settings_t));
+	return(true);
 }
 
 
@@ -265,6 +258,7 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
       case 25: settings.homing_seek_rate = value; break;
       case 26: settings.homing_debounce_delay = int_value; break;
       case 27: settings.homing_pulloff = value; break;
+	  case 28: settings.laser_power_divisor = int_value; break;
       default: 
         return(STATUS_INVALID_STATEMENT);
     }
