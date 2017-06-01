@@ -21,6 +21,8 @@
   
 #include "grbl.h"
 
+volatile uint32_t old_limit_port_value = 0;
+volatile uint32_t new_limit_port_value = 0;
 
 // Homing axis search distance multiplier. Computed by this value times the cycle travel.
 #ifndef HOMING_AXIS_SEARCH_SCALAR
@@ -30,8 +32,68 @@
   #define HOMING_AXIS_LOCATE_SCALAR  5.0 // Must be > 1 to ensure limit switch is cleared.
 #endif
 
+// This is the Limit Pin Change Interrupt, which handles the hard limit feature. A bouncing 
+// limit switch can cause a lot of problems, like false readings and multiple interrupt calls.
+// If a switch is triggered at all, something bad has happened and treat it as such, regardless
+// if a limit switch is being disengaged. It's impossible to reliably tell the state of a 
+// bouncing pin without a debouncing method. A simple software debouncing feature may be enabled 
+// through the config.h file, where an extra timer delays the limit pin read by several milli-
+// seconds to help with, not fix, bouncing switches.
+// NOTE: Do not attach an e-stop to the limit pins, because this interrupt is disabled during
+// homing cycles and will not respond correctly. Upon user request or need, there may be a
+// special pinout for an e-stop, but it is generally recommended to just directly connect
+// your e-stop switch to the Arduino reset pin, since it is the most correct way to do this.
+
+void __USER_ISR int_change_notification_IRQ() {
+
+	clearIntFlag(_CHANGE_NOTICE_IRQ);
+}
+
+
+/*
+CN CONFIGURATION AND OPERATION
+The CN pins are configured as follows:
+1.Disable CPU interrupts.
+2.Set desired CN I/O pin as input by setting corresponding TRISx register bits = 1.
+3.Enable the CN Module ON bit (CNCON<15>) = 1.
+4.Enable individual CN input pin(s), enable optional pull up(s) or pull down(s).
+5.Read corresponding PORTx registers to clear mismatch condition on CN input pins.
+6.Configure the CN interrupt priority bits, CNIP<2:0> (IPC6<20:18>), and subpriority bits CNIS<1:0> (IPC6<17:16>).
+7.Clear the CN interrupt flag bit, CNIF(IFS1<0>) = 0.
+8.Enable the CN interrupt enable bit, CNIE (IEC1<0>) = 1.
+9.Enable CPU interrupts.
+When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s).
+This will clear the mismatch condition and set up the CN logic to detect the next pin change.
+The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt or during initialization,
+and used to determine which pin changed.
+The CN pins have a minimum input pulse-width specification.
+*/
 void limits_init() 
 {
+
+	uint32_t intStatus = disableInterrupts();
+
+	// enbale Change Notification interrupt
+	CONTROL_PORT->TRISxSET.w = CONTROL_MASK; // input
+	portADC->adxPcfg.set = CONTROL_MASK;	// those pins are analog too.
+	if (bit_istrue(settings.flags, BITFLAG_HARD_LIMIT_ENABLE)) { // limit can be disabled
+		portCN->cnPue.set = CONTROL_CN_MASK;	// pull-up
+		portCN->cnEn.set = CONTROL_CN_MASK;	// enable pin for CN
+	}
+	CONTROL2_PORT->TRISxSET.w = CONTROL2_MASK; // input (stop & z-probe). not analog pin
+	portCN->cnPue.set = CONTROL2_CN_MASK;
+	portCN->cnEn.set = CONTROL2_CN_MASK;
+	portCN->cnCon.set = B1 << 15;		// enable notification
+	old_limit_port_value = CONTROL_PORT->PORTxbits.w;	// 1st read to clear mismatch
+	setIntVector(_CHANGE_NOTICE_VECTOR, int_change_notification_IRQ);
+	setIntPriority(_CHANGE_NOTICE_VECTOR, 4, 0);
+	clearIntFlag(_CHANGE_NOTICE_IRQ);
+	setIntEnable(_CHANGE_NOTICE_IRQ);
+	restoreInterrupts(intStatus);
+
+
+
+
   LIMIT_DDR &= ~(LIMIT_MASK); // Set as input pins
 
   #ifdef DISABLE_LIMIT_PIN_PULL_UP
@@ -58,8 +120,7 @@ void limits_init()
 // Disables hard limits.
 void limits_disable()
 {
-  LIMIT_PCMSK &= ~LIMIT_MASK;  // Disable specific pins of the Pin Change Interrupt
-  PCICR &= ~(1 << LIMIT_INT);  // Disable Pin Change Interrupt
+  portCN->cnEn.clr = CONTROL_MASK;	// Disable notification for limit but not other controls (alarm button & z-probe)
 }
 
 
@@ -84,17 +145,13 @@ uint8_t limits_get_state()
 }
 
 
-// This is the Limit Pin Change Interrupt, which handles the hard limit feature. A bouncing 
-// limit switch can cause a lot of problems, like false readings and multiple interrupt calls.
-// If a switch is triggered at all, something bad has happened and treat it as such, regardless
-// if a limit switch is being disengaged. It's impossible to reliably tell the state of a 
-// bouncing pin without a debouncing method. A simple software debouncing feature may be enabled 
-// through the config.h file, where an extra timer delays the limit pin read by several milli-
-// seconds to help with, not fix, bouncing switches.
-// NOTE: Do not attach an e-stop to the limit pins, because this interrupt is disabled during
-// homing cycles and will not respond correctly. Upon user request or need, there may be a
-// special pinout for an e-stop, but it is generally recommended to just directly connect
-// your e-stop switch to the Arduino reset pin, since it is the most correct way to do this.
+
+
+
+
+
+
+
 #ifndef ENABLE_SOFTWARE_DEBOUNCE
   ISR(LIMIT_INT_vect) // DEFAULT: Limit pin change interrupt process. 
   {

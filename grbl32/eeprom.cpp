@@ -28,11 +28,6 @@
 
 AT24C32 eeprom;
 
-/* These EEPROM bits have different names on different devices. */
-
-/* Define to reduce code size. */
-#define EEPROM_IGNORE_SELFPROG //!< Remove SPM flag polling.
-
 /*! \brief  Read byte from EEPROM. */
 unsigned char eeprom_get_char( unsigned int addr )
 {
@@ -53,5 +48,3 @@ int memcpy_from_eeprom_with_checksum(char *destination, unsigned int source, uns
 	eeprom.readChars(source, destination, size);
 	return 1;
 }
-
-// end of file

@@ -283,7 +283,7 @@
 // NOTE: All CONTROLs pins must be on the same port and not on a port with other input pins (limits).
 #define CONTROL_DDR       DDRK
 #define CONTROL_PIN       PINK
-#define CONTROL_PORT      PORTK
+//#define CONTROL_PORT      PORTK
 #define RESET_BIT         0  // MEGA2560 Analog Pin 8
 #define FEED_HOLD_BIT     1  // MEGA2560 Analog Pin 9
 #define CYCLE_START_BIT   2  // MEGA2560 Analog Pin 10

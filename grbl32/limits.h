@@ -22,6 +22,8 @@
 #ifndef limits_h
 #define limits_h 
 
+#include "grbl.h"
+#include "extern_definition.h"
 
 // Initialize the limits module
 void limits_init();
