@@ -45,7 +45,8 @@ volatile uint32_t new_limit_port_value = 0;
 // your e-stop switch to the Arduino reset pin, since it is the most correct way to do this.
 
 void __USER_ISR int_change_notification_IRQ() {
-
+	old_limit_port_value = new_limit_port_value;
+	new_limit_port_value = CONTROL_PORT->port.reg;
 	clearIntFlag(_CHANGE_NOTICE_IRQ);
 }
 
@@ -90,30 +91,6 @@ void limits_init()
 	clearIntFlag(_CHANGE_NOTICE_IRQ);
 	setIntEnable(_CHANGE_NOTICE_IRQ);
 	restoreInterrupts(intStatus);
-
-
-
-
-  LIMIT_DDR &= ~(LIMIT_MASK); // Set as input pins
-
-  #ifdef DISABLE_LIMIT_PIN_PULL_UP
-    LIMIT_PORT &= ~(LIMIT_MASK); // Normal low operation. Requires external pull-down.
-  #else
-    LIMIT_PORT |= (LIMIT_MASK);  // Enable internal pull-up resistors. Normal high operation.
-  #endif
-
-  if (bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE)) {
-    LIMIT_PCMSK |= LIMIT_MASK; // Enable specific pins of the Pin Change Interrupt
-    PCICR |= (1 << LIMIT_INT); // Enable Pin Change Interrupt
-  } else {
-    limits_disable(); 
-  }
-  
-  #ifdef ENABLE_SOFTWARE_DEBOUNCE
-    MCUSR &= ~(1<<WDRF);
-    WDTCSR |= (1<<WDCE) | (1<<WDE);
-    WDTCSR = (1<<WDP0); // Set time-out at ~32msec.
-  #endif
 }
 
 
@@ -130,18 +107,29 @@ void limits_disable()
 uint8_t limits_get_state()
 {
   uint8_t limit_state = 0;
-  uint8_t pin = (LIMIT_PIN & LIMIT_MASK);
-  #ifdef INVERT_LIMIT_PIN_MASK
-    pin ^= INVERT_LIMIT_PIN_MASK;
-  #endif
-  if (bit_isfalse(settings.flags,BITFLAG_INVERT_LIMIT_PINS)) { pin ^= LIMIT_MASK; }
-  if (pin) {  
-    uint8_t idx;
-    for (idx=0; idx<N_AXIS; idx++) {
-      if (pin & get_limit_pin_mask(idx)) { limit_state |= (1 << idx); }
-    }
+  if ((Xmax_LIMIT_MASK && new_limit_port_value) || (Xmin_LIMIT_MASK && new_limit_port_value)) {
+	  limit_state |= 1;
+  }
+  if ((Ymax_LIMIT_MASK && new_limit_port_value) || (Ymin_LIMIT_MASK && new_limit_port_value)) {
+	  limit_state |= (1<<1);
+  }
+  if ((Zmax_LIMIT_MASK && new_limit_port_value) || (Zmin_LIMIT_MASK && new_limit_port_value)) {
+	  limit_state |= (2<<1);
   }
   return(limit_state);
+  // **REMOVE** //
+  //uint8_t pin = (LIMIT_PIN & LIMIT_MASK);
+  //#ifdef INVERT_LIMIT_PIN_MASK
+  //  pin ^= INVERT_LIMIT_PIN_MASK;
+  //#endif
+  //if (bit_isfalse(settings.flags,BITFLAG_INVERT_LIMIT_PINS)) { pin ^= LIMIT_MASK; }
+  //if (pin) {  
+  //  uint8_t idx;
+  //  for (idx=0; idx<N_AXIS; idx++) {
+  //    if (pin & get_limit_pin_mask(idx)) { limit_state |= (1 << idx); }
+  //  }
+  //}
+  //return(limit_state);
 }
 
 
@@ -151,47 +139,47 @@ uint8_t limits_get_state()
 
 
 
-
-#ifndef ENABLE_SOFTWARE_DEBOUNCE
-  ISR(LIMIT_INT_vect) // DEFAULT: Limit pin change interrupt process. 
-  {
-    // Ignore limit switches if already in an alarm state or in-process of executing an alarm.
-    // When in the alarm state, Grbl should have been reset or will force a reset, so any pending 
-    // moves in the planner and serial buffers are all cleared and newly sent blocks will be 
-    // locked out until a homing cycle or a kill lock command. Allows the user to disable the hard
-    // limit setting if their limits are constantly triggering after a reset and move their axes.
-    if (sys.state != STATE_ALARM) { 
-      if (!(sys_rt_exec_alarm)) {
-        #ifdef HARD_LIMIT_FORCE_STATE_CHECK
-          // Check limit pin state. 
-          if (limits_get_state()) {
-            mc_reset(); // Initiate system kill.
-            bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
-          }
-        #else
-          mc_reset(); // Initiate system kill.
-          bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
-        #endif
-      }
-    }
-  }  
-#else // OPTIONAL: Software debounce limit pin routine.
-  // Upon limit pin change, enable watchdog timer to create a short delay. 
-  ISR(LIMIT_INT_vect) { if (!(WDTCSR & (1<<WDIE))) { WDTCSR |= (1<<WDIE); } }
-  ISR(WDT_vect) // Watchdog timer ISR
-  {
-    WDTCSR &= ~(1<<WDIE); // Disable watchdog timer. 
-    if (sys.state != STATE_ALARM) {  // Ignore if already in alarm state. 
-      if (!(sys_rt_exec_alarm)) {
-        // Check limit pin state. 
-        if (limits_get_state()) {
-          mc_reset(); // Initiate system kill.
-          bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
-        }
-      }  
-    }
-  }
-#endif
+// **REMOVE** //
+//#ifndef ENABLE_SOFTWARE_DEBOUNCE
+//  ISR(LIMIT_INT_vect) // DEFAULT: Limit pin change interrupt process. 
+//  {
+//    // Ignore limit switches if already in an alarm state or in-process of executing an alarm.
+//    // When in the alarm state, Grbl should have been reset or will force a reset, so any pending 
+//    // moves in the planner and serial buffers are all cleared and newly sent blocks will be 
+//    // locked out until a homing cycle or a kill lock command. Allows the user to disable the hard
+//    // limit setting if their limits are constantly triggering after a reset and move their axes.
+//    if (sys.state != STATE_ALARM) { 
+//      if (!(sys_rt_exec_alarm)) {
+//        #ifdef HARD_LIMIT_FORCE_STATE_CHECK
+//          // Check limit pin state. 
+//          if (limits_get_state()) {
+//            mc_reset(); // Initiate system kill.
+//            bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
+//          }
+//        #else
+//          mc_reset(); // Initiate system kill.
+//          bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
+//        #endif
+//      }
+//    }
+//  }  
+//#else // OPTIONAL: Software debounce limit pin routine.
+//  // Upon limit pin change, enable watchdog timer to create a short delay. 
+//  ISR(LIMIT_INT_vect) { if (!(WDTCSR & (1<<WDIE))) { WDTCSR |= (1<<WDIE); } }
+//  ISR(WDT_vect) // Watchdog timer ISR
+//  {
+//    WDTCSR &= ~(1<<WDIE); // Disable watchdog timer. 
+//    if (sys.state != STATE_ALARM) {  // Ignore if already in alarm state. 
+//      if (!(sys_rt_exec_alarm)) {
+//        // Check limit pin state. 
+//        if (limits_get_state()) {
+//          mc_reset(); // Initiate system kill.
+//          bit_true_atomic(sys_rt_exec_alarm, (EXEC_ALARM_HARD_LIMIT|EXEC_CRITICAL_EVENT)); // Indicate hard limit critical event
+//        }
+//      }  
+//    }
+//  }
+//#endif
 
  
 // Homes the specified cycle axes, sets the machine position, and performs a pull-off motion after
