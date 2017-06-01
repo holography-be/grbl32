@@ -26,17 +26,23 @@
 #define GRBL_VERSION_BUILD "20160317"
 
 // Define standard libraries used by Grbl.
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <avr/interrupt.h>
-#include <avr/wdt.h>
-#include <util/delay.h>
+//#include <avr/io.h>
+//#include <avr/pgmspace.h>
+//#include <avr/interrupt.h>
+//#include <avr/wdt.h>
+//#include <util/delay.h>
+
+#include <xc.h>
+#include "p32mx795f512l.h"
+#include "p32_defs.h"
 #include <math.h>
 #include <inttypes.h>    
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <binary.h>
+#include <wiring.h>
 
 // Define the Grbl system include files. NOTE: Do not alter organization.
 #include "config.h"
